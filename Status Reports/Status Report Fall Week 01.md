@@ -2,8 +2,11 @@
 
 ## student names
 **Minh Nguyen**
+
 **Bryan Soerjanto** 
+
 **David Tran**
+
 **Amaris Young-Diggs**
 
 **Mentor:Hong-Sheng Zhou**
