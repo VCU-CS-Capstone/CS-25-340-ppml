@@ -1,6 +1,6 @@
-# *Your Project Description*
-## *Sponsoring Company or Organization*
-## *Short Project Description*
+# *Machine learning has been widely used. However, in machine learning, useful information must be extracted from massive data, and today we are facing huge challenges of privacy leakage. In this project, using cutting-edge cryptographic techniques (e.g., secure computation), we design and implement a system with the goal of achieving better privacy protection.*
+## *VCU Engineering*
+## *using cutting-edge cryptographic techniques (e.g., secure computation), we design and implement a system with the goal of achieving better privacy protection.*
 The directory structure in this GitHub is to allow the project to have all its resources self-contained.
 Open Source software should not just be a repository of code.  There are a number of directories to help you and others who will 
 follow in your footsteps.  It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get
@@ -17,10 +17,10 @@ a better understanding of the problems you encountered during the development of
 **Note:** Commits behind this fork could be automatically synced, meaning that changes made in the template are pushed into your repo. Please do not discard commits ahead (these are the updates you make to this repository).
 
 ## Project Team
-- *Mentor's Name*  - *Company Affliation* - Mentor
-- *Technical Advisor Name* - *Company Affliation* - Technical Advisor
-- *Faculty Advisor's Name* - *Department* - Faculty Advisor
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
-- *Student's Name* - *major* - Student Team Member
+- *Hong-Sheng Zhou*  - *College of Engineering* - Mentor
+- *Hong-Sheng Zhou* - *College of Engineering* - Technical Advisor
+- *Dr. João S. Soares* - *College of Engineering* - Faculty Advisor
+- *Student's Name* - *Computer Science* - Minh Nguyen
+- *Student's Name* - *Computer Science* - Bryan Soerjanto
+- *Student's Name* - *Computer Science* - David Tran
+- *Student's Name* - *Computer Science* - Amaris Young-Diggs
