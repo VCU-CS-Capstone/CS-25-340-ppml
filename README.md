@@ -1,4 +1,4 @@
-# Machine learning has been widely used. However, in machine learning, useful information must be extracted from massive data, and today we are facing huge challenges of privacy leakage. In this project, using cutting-edge cryptographic techniques (e.g., secure computation), we design and implement a system with the goal of achieving better privacy protection.
+# *CS 25-340 Privacy Preserving Machine Learning*
 ## VCU Engineering
 ## Using cutting-edge cryptographic techniques (e.g., secure computation), we design and implement a system with the goal of achieving better privacy protection.
 The directory structure in this GitHub is to allow the project to have all its resources self-contained.
