@@ -18,13 +18,13 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 5 Status Report |Research project information | Get more knowledge about cryptography and machine learning |no issues |
 | Week 6 Status Report |Meet with mentor | Got background information about where to start for project and what frameworks are recommended|no issues |
 | Week 7 Status Report |Project Proposal | Successfully completed project proposal| no issues |
-| Week 8 Status Report | | | |
-| Week 9 Status Report | | | |
-| Week 10 Status Report | | | |
-| Week 11 Status Report | | | |
-| Week 12 Status Report | | | |
-| Week 13 Status Report | | | |
-| Week 14 Status Report | | | |
+| Week 8 Status Report |Research |Started researching on homomorphic encryption and what the idea behind is |no issues |
+| Week 9 Status Report |Research |Looked into frameworks and how to encrypt the data, and methods of secure computing  |no issues |
+| Week 10 Status Report |Meet with mentor |Asked mentor if the framework was usable and what to do next |no issues |
+| Week 11 Status Report |Research |Looked into other frameworks and verified with the specifications mentioned by mentor  |no issues |
+| Week 12 Status Report |Internal Meeting |Met with group members to work on framework and check out how it worked|no issues |
+| Week 13 Status Report |Fall Design Poster |Met with advisor and discussed the poster and what needed to be on it |no issues |
+| Week 14 Status Report |Weekly Reports | Completed weekly reports and turned in assignment |no issues|
 | Week 15 Status Report | | | |
 | Week 16 Status Report | | | |
 
