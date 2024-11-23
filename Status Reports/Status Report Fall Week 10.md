@@ -14,11 +14,10 @@
 **Faculty Advisor:Dr. João S. Soares**
 
 ## 1) Accomplishments this week ##
-   - Project Proposal
+   - Asked mentor if the framework was usable and what to do next
 
 ## 2) Milestones to be completed next week ##
-   - Successfully completed project proposal
-   - Homomorphic Encryption research
+   - Research on additional HE frameworks
 
 ## 3) Issues, problems or concerns ##
    - no issues ATP

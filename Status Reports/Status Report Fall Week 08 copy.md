@@ -14,11 +14,10 @@
 **Faculty Advisor:Dr. João S. Soares**
 
 ## 1) Accomplishments this week ##
-   - Project Proposal
+   - Started researching on homomorphic encryption and what the idea behind is
 
 ## 2) Milestones to be completed next week ##
-   - Successfully completed project proposal
-   - Homomorphic Encryption research
+   - Research on HE frameworks
 
 ## 3) Issues, problems or concerns ##
    - no issues ATP
