@@ -25,8 +25,8 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 12 Status Report |Internal Meeting |Met with group members to work on framework and check out how it worked|no issues |
 | Week 13 Status Report |Fall Design Poster |Met with advisor and discussed the poster and what needed to be on it |no issues |
 | Week 14 Status Report |Weekly Reports | Completed weekly reports and turned in assignment |no issues|
-| Week 15 Status Report | | | |
-| Week 16 Status Report | | | |
+| Week 15 Status Report |Poster Presentation  |Presented our poster at the Capstone Event with other seniors |no issues |
+| Week 16 Status Report |Planning |Establishing what our Spring semester goals are and how we are going to accomplish the project |no issues |
 
 ## Spring Semester
 
