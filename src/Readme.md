@@ -9,3 +9,20 @@ Please document here
 | | |
 | | |
 | | |
+
+
+# Enter python environment
+
+## Windows
+
+1. Creating the Environment
+
+```sh
+python -m venv capstone
+```
+
+2. Activating the Environment
+
+```sh
+myenv\Scripts\activate
+```
