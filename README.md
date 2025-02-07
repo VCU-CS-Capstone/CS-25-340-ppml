@@ -1,6 +1,6 @@
-# *Machine learning has been widely used. However, in machine learning, useful information must be extracted from massive data, and today we are facing huge challenges of privacy leakage. In this project, using cutting-edge cryptographic techniques (e.g., secure computation), we design and implement a system with the goal of achieving better privacy protection.*
-## *VCU Engineering*
-## *using cutting-edge cryptographic techniques (e.g., secure computation), we design and implement a system with the goal of achieving better privacy protection.*
+# *CS 25-340 Privacy Preserving Machine Learning*
+## VCU Engineering
+## Using cutting-edge cryptographic techniques (e.g., secure computation), we design and implement a system with the goal of achieving better privacy protection.
 The directory structure in this GitHub is to allow the project to have all its resources self-contained.
 Open Source software should not just be a repository of code.  There are a number of directories to help you and others who will 
 follow in your footsteps.  It'll also allow the Linux Foundation OMP Mentorship program to keep track of your project and get
@@ -20,7 +20,7 @@ a better understanding of the problems you encountered during the development of
 - *Hong-Sheng Zhou*  - *College of Engineering* - Mentor
 - *Hong-Sheng Zhou* - *College of Engineering* - Technical Advisor
 - *Dr. João S. Soares* - *College of Engineering* - Faculty Advisor
-- *Student's Name* - *Computer Science* - Minh Nguyen
-- *Student's Name* - *Computer Science* - Bryan Soerjanto
-- *Student's Name* - *Computer Science* - David Tran
-- *Student's Name* - *Computer Science* - Amaris Young-Diggs
+- *Minh Nguyen* - *Computer Science* - Student
+- *Bryan Soerjanto* - *Computer Science* - Student
+- *David Tran* - *Computer Science* - Student
+- *Amaris Young-Diggs* - *Computer Science* - Student
