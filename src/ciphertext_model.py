@@ -24,9 +24,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 enc_X_train = [ts.ckks_vector(context, x) for x in X_train]
 enc_y_train = [ts.ckks_vector(context, [y]) for y in y_train]
 
-# Step 3: Initialize encrypted weights and bias
-enc_weights = [ts.ckks_vector(context, [0.0]) for _ in range(X_train.shape[1])]
-enc_bias = ts.ckks_vector(context, [0.0])
+# Step 3: Initialize plaintext weights and encrypted bias
+weights = np.zeros(X_train.shape[1])  # Plaintext weights
+enc_bias = ts.ckks_vector(context, [0.0])  # Encrypted bias
 
 # Step 4: Homomorphic training (gradient descent)
 learning_rate = 0.01
@@ -36,28 +36,27 @@ for epoch in range(num_epochs):
     for x, y in zip(enc_X_train, enc_y_train):
         # Forward pass: Compute encrypted logit
         logit = enc_bias
-        for i in range(len(enc_weights)):
-            logit = logit + enc_weights[i] * x[i]
+        for i in range(len(weights)):
+            logit = logit + x[i] * weights[i]  # Multiply encrypted feature by plaintext weight
         
         # Compute error (y - logit)
         error = y - logit
         
-        # Backpropagation: Update weights and bias
-        for i in range(len(enc_weights)):
-            enc_weights[i] = enc_weights[i] + learning_rate * error * x[i]
-        enc_bias = enc_bias + learning_rate * error
+        # Backpropagation: Update plaintext weights and encrypted bias
+        for i in range(len(weights)):
+            weights[i] = weights[i] + learning_rate * error.decrypt()[0] * X_train[j][i]  # Update weights in plaintext
+        enc_bias = enc_bias + learning_rate * error  # Update bias homomorphically
 
-# Step 5: Decrypt the final model
-decrypted_weights = [w.decrypt()[0] for w in enc_weights]
+# Step 5: Decrypt the final bias
 decrypted_bias = enc_bias.decrypt()[0]
 
-print("Decrypted Weights:", decrypted_weights)
+print("Plaintext Weights:", weights)
 print("Decrypted Bias:", decrypted_bias)
 
-# Step 6: Evaluate the encrypted model
+# Step 6: Evaluate the model
 def predict(X, weights, bias):
     return [1 if (np.dot(x, weights) + bias) > 0 else 0 for x in X]
 
-predictions = predict(X_test, decrypted_weights, decrypted_bias)
+predictions = predict(X_test, weights, decrypted_bias)
 accuracy = accuracy_score(y_test, predictions)
 print(f"Encrypted Model Accuracy: {accuracy:.2f}")
