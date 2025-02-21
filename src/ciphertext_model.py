@@ -21,6 +21,7 @@ y = df["Disease"].values
 # Split into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Encrypt the training data
 enc_X_train = [ts.ckks_vector(context, x) for x in X_train]
 enc_y_train = [ts.ckks_vector(context, [y]) for y in y_train]
 
@@ -33,11 +34,16 @@ learning_rate = 0.01
 num_epochs = 10
 
 for epoch in range(num_epochs):
-    for x, y in zip(enc_X_train, enc_y_train):
+    for j in range(len(enc_X_train)):
+        x = enc_X_train[j]
+        y = enc_y_train[j]
+        
         # Forward pass: Compute encrypted logit
         logit = enc_bias
         for i in range(len(weights)):
-            logit = logit + x[i] * weights[i]  # Multiply encrypted feature by plaintext weight
+            # Multiply encrypted feature by plaintext weight
+            weighted_feature = x * weights[i]
+            logit = logit + weighted_feature
         
         # Compute error (y - logit)
         error = y - logit
