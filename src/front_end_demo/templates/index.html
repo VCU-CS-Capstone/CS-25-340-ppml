@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homomorphic Encryption Demo</title>
+    <script>
+        async function encryptData() {
+            let inputData = document.getElementById("dataset").value;
+            let dataArray = inputData.split(",").map(Number);
+
+            const response = await fetch('/encrypt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: dataArray })
+            });
+
+            const result = await response.json();
+            document.getElementById("encryptedOutput").innerText = JSON.stringify(result, null, 2);
+        }
+
+        async function trainModel() {
+            let encryptedData = document.getElementById("encryptedOutput").innerText;
+
+            const response = await fetch('/train', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ encrypted_data: encryptedData })
+            });
+
+            const result = await response.json();
+            document.getElementById("trainOutput").innerText = result.message;
+        }
+    </script>
+</head>
+<body>
+    <h1>Homomorphic Encryption Demo</h1>
+
+    <label for="dataset">Enter Dataset (comma-separated numbers):</label>
+    <input type="text" id="dataset" placeholder="e.g., 1.2, 3.4, 5.6">
+    <button onclick="encryptData()">Encrypt Data</button>
+
+    <h3>Encrypted Output:</h3>
+    <pre id="encryptedOutput"></pre>
+
+    <button onclick="trainModel()">Train Model</button>
+
+    <h3>Training Status:</h3>
+    <pre id="trainOutput"></pre>
+</body>
+</html>
