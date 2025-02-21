@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import matthews_corrcoef
 from sklearn.model_selection import train_test_split
 
 # Load dataset
@@ -72,6 +73,12 @@ except FileNotFoundError:
 # Encrypt the model on load
 encrypted_global_weights = ts.ckks_vector(context, global_weights)
 encrypted_global_intercept = ts.ckks_vector(context, [global_intercept])
+
+# ---------------- TRAINING SET MCC ----------------
+# Compute MCC on training set
+train_predictions = (X @ global_weights + global_intercept) > 0.5  # Predict on training set
+train_mcc = matthews_corrcoef(y, train_predictions)
+print(f"MCC on training set: {train_mcc:.4f}")
 
 # ---------------- PREDICTION ON NEW DATASET ----------------
 # Load new dataset
