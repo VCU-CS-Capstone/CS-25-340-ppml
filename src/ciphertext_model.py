@@ -2,6 +2,8 @@ import tenseal as ts
 import pandas as pd
 import numpy as np
 import pickle
+import os
+from cryptography.fernet import Fernet, InvalidToken
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import matthews_corrcoef
 from sklearn.model_selection import train_test_split
@@ -31,15 +33,50 @@ context.global_scale = 2**40
 context.generate_galois_keys()
 context.generate_relin_keys()
 
+# Secure AES Encryption for Model Storage
+def generate_key():
+    key = Fernet.generate_key()
+    with open("secret.key", "wb") as key_file:
+        key_file.write(key)
+
+def load_key():
+    with open("secret.key", "rb") as key_file:
+        return key_file.read()
+
+if not os.path.exists("secret.key"):
+    generate_key()
+key = load_key()
+cipher = Fernet(key)
+
+model_file = "encrypted_model.pkl"
+
 # Federated Training (Run Once, Then Save Model)
-model_file = "plaintext_model.pkl"
-try:
-    # Try to load pre-trained plaintext model
-    with open(model_file, "rb") as f:
-        global_weights, global_intercept = pickle.load(f)
-    print("Loaded pre-trained model.")
-except FileNotFoundError:
+if os.path.exists(model_file):
+    try:
+        # Try to load and decrypt pre-trained model
+        with open(model_file, "rb") as f:
+            encrypted_model = f.read()
+        decrypted_model = cipher.decrypt(encrypted_model)
+        global_weights, global_intercept = pickle.loads(decrypted_model)
+        print("Loaded encrypted pre-trained model.")
+        
+        # Immediately encrypt into TenSEAL to prevent exposure
+        encrypted_global_weights = ts.ckks_vector(context, global_weights)
+        encrypted_global_intercept = ts.ckks_vector(context, [global_intercept])
+        
+        # Wipe plaintext variables
+        del global_weights, global_intercept
+    except (pickle.UnpicklingError, InvalidToken):
+        print("Invalid or corrupt model file. Training a new one...")
+        os.remove(model_file)  # Delete the corrupt model file
+        train_new_model = True
+    else:
+        train_new_model = False
+else:
     print("No pre-trained model found. Training a new one...")
+    train_new_model = True
+
+if train_new_model:
     global_weights = np.zeros(X.shape[1])
     global_intercept = 0
     num_epochs = 20  # Increased epochs for better training
@@ -65,18 +102,23 @@ except FileNotFoundError:
         global_weights = avg_weights
         global_intercept = avg_intercept
     
-    # Save plaintext model weights
+    # Encrypt and save model weights
+    serialized_model = pickle.dumps((global_weights, global_intercept))
+    encrypted_model = cipher.encrypt(serialized_model)
     with open(model_file, "wb") as f:
-        pickle.dump((global_weights, global_intercept), f)
-    print("Saved trained model.")
-
-# Encrypt the model on load
-encrypted_global_weights = ts.ckks_vector(context, global_weights)
-encrypted_global_intercept = ts.ckks_vector(context, [global_intercept])
+        f.write(encrypted_model)
+    print("Saved encrypted trained model.")
+    
+    # Immediately encrypt into TenSEAL to prevent exposure
+    encrypted_global_weights = ts.ckks_vector(context, global_weights)
+    encrypted_global_intercept = ts.ckks_vector(context, [global_intercept])
+    
+    # Wipe plaintext variables
+    del global_weights, global_intercept
 
 # ---------------- TRAINING SET MCC ----------------
 # Compute MCC on training set
-train_predictions = (X @ global_weights + global_intercept) > 0.5  # Predict on training set
+train_predictions = (X @ encrypted_global_weights.decrypt() + encrypted_global_intercept.decrypt()[0]) > 0.5
 train_mcc = matthews_corrcoef(y, train_predictions)
 print(f"MCC on training set: {train_mcc:.4f}")
 
