@@ -39,8 +39,7 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 5 Status Report | Test code | Finished implementing test code and used some trial data to run a test. | Funding, output, and does the whole code have to be encrypted |
 | Week 6 Status Report | Meet with professor | Met with the professor and questioned funding and asked about the aspect of our code | no issues |
 | Week 7 Status Report | No meeting this week | We couldn't meet this week | no issues |
-| Week 8 Status Report | Status reports | Filled out all the status reports and turned in the assignment
- | no issues |
+| Week 8 Status Report | Status reports | Filled out all the status reports and turned in the assignment| no issues |
 | Week 9 Status Report | | | |
 | Week 10 Status Report | | | |
 | Week 11 Status Report | | | |
