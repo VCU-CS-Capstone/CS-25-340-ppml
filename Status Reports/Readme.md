@@ -32,14 +32,15 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 
 | Document | Tasks | Accomplishments| Issues |
 |---|---|---|---|
-| Week 1 Status Report | | | |
-| Week 2 Status Report | | | |
-| Week 3 Status Report | | | |
-| Week 4 Status Report | | | |
-| Week 5 Status Report | | | |
-| Week 6 Status Report | | | |
-| Week 7 Status Report | | | |
-| Week 8 Status Report | | | |
+| Week 1 Status Report | No meeting this week | We couldn't meet this week | no issues |
+| Week 2 Status Report | Reasearch templates | Reasearched possibilities of other templates currently testing TenSeal | no issues |
+| Week 3 Status Report | Test templates | Found some templates of homomorphic encryption schemes for a design using TenSeal | no issues |
+| Week 4 Status Report | Test code | Got sample code to experiment with and researching data to go with it | no issues |
+| Week 5 Status Report | Test code | Finished implementing test code and used some trial data to run a test. | Funding, output, and does the whole code have to be encrypted |
+| Week 6 Status Report | Meet with professor | Met with the professor and questioned funding and asked about the aspect of our code | no issues |
+| Week 7 Status Report | No meeting this week | We couldn't meet this week | no issues |
+| Week 8 Status Report | Status reports | Filled out all the status reports and turned in the assignment
+ | no issues |
 | Week 9 Status Report | | | |
 | Week 10 Status Report | | | |
 | Week 11 Status Report | | | |
