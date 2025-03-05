@@ -18,6 +18,7 @@
 
 ## 2) Milestones to be completed next week ##
    - Make regular trial runs to test patient data encryption
+   - Get started on front-end to streamline demo and for organization
 
 ## 3) Issues, problems or concerns ##
    - no issues ATP
