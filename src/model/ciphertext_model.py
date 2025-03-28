@@ -8,7 +8,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import matthews_corrcoef
 
 # --- Load Dataset ---
-data = pd.read_csv("diabetes.csv")
+data = pd.read_csv("../data/raw/diabetes.csv")
 X = data.drop(columns=["Outcome"]).values
 y = data["Outcome"].values
 
@@ -107,7 +107,7 @@ train_mcc = matthews_corrcoef(y, train_preds)
 print(f"MCC on training set: {train_mcc:.4f}")
 
 # --- New Data Prediction ---
-new_data = pd.read_csv("new_data.csv")
+new_data = pd.read_csv("../data/raw/new_data.csv")
 if "Outcome" in new_data.columns:
     print("Warning: 'Outcome' column found but will be ignored for predictions")
     new_X = new_data.drop(columns=["Outcome"]).values
@@ -129,8 +129,6 @@ predictions = []
 for x_enc in encrypted_new_X:
     pred = x_enc.dot(encrypted_weights) + encrypted_intercept
     predictions.append(1 if pred.decrypt()[0] > 0.5 else 0)
-
-print("Predictions for new dataset:", predictions)
 
 # --- Distribution Analysis ---
 print(f"Prediction distribution: {predictions.count(0)} zeros, {predictions.count(1)} ones")
