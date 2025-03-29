@@ -31,7 +31,12 @@ if uploaded_file is not None:
         with st.spinner("Encrypting & predicting..."):
             result = subprocess.run(["python", "ciphertext_model.py"], capture_output=True, text=True)
 
-        st.markdown("<div style='padding: 0.5em; background-color: #1e3a8a; border-radius: 0.5em; color: white;'>✔ Inference completed!</div>", unsafe_allow_html=True)
+        st.markdown("""
+<div style='padding: 0.5em; background-color: #1e3a8a; border-radius: 0.5em; color: white;'>
+✔ Inference completed!<br>
+<span style='color: #dbeafe;'>Prediction Breakdown will appear below if available.</span>
+</div>
+""", unsafe_allow_html=True)
 
         output = result.stdout.splitlines()
         show = False
@@ -56,6 +61,22 @@ if uploaded_file is not None:
                 st.warning("⚠ Could not load predictions from file.")
 
         if predictions and len(predictions) == len(df):
+            zero_count = predictions.count(0)
+            one_count = predictions.count(1)
+            st.markdown(f"<div style='background-color: #111827; padding: 0.5em; border-radius: 0.25em; color: #d1d5db; font-family: monospace;'>Prediction Breakdown: {zero_count} non-diabetic, {one_count} diabetic</div>", unsafe_allow_html=True)
+            if abs(zero_count - one_count) > 0.6 * len(predictions):
+                st.warning("⚠ Prediction results show class imbalance — this could indicate a biased or undertrained model.")
+
+            with st.expander("🔍 Feature Correlation Heatmap"):
+                st.subheader("📊 Feature Correlation Heatmap")
+                try:
+                    corr = df.drop(columns=["Prediction"], errors="ignore").corr()
+                    fig, ax = plt.subplots()
+                    sns.heatmap(corr, cmap="coolwarm", annot=True, fmt=".2f", ax=ax)
+                    st.pyplot(fig)
+                except Exception as e:
+                    st.warning(f"Could not display heatmap: {e}")
+
             df["Prediction"] = predictions
 
             with st.expander("📌 Feature Distributions by Prediction"):
