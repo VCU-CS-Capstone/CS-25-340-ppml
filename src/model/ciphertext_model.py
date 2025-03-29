@@ -107,7 +107,7 @@ train_mcc = matthews_corrcoef(y, train_preds)
 print(f"MCC on training set: {train_mcc:.4f}")
 
 # --- New Data Prediction ---
-new_data = pd.read_csv("../data/raw/synthetic_data.csv")
+new_data = pd.read_csv("new_data.csv")
 if "Outcome" in new_data.columns:
     print("Warning: 'Outcome' column found but will be ignored for predictions")
     new_X = new_data.drop(columns=["Outcome"]).values
@@ -132,16 +132,23 @@ for x_enc in encrypted_new_X:
 
 
 # --- Distribution Analysis ---
+import json
+
+# Save predictions to file for frontend access
+with open("predictions.json", "w") as f:
+    json.dump(predictions, f)
+
 print(f"Prediction distribution: {predictions.count(0)} zeros, {predictions.count(1)} ones")
+
 print(f"Training set distribution: {len(y) - sum(y)} zeros, {sum(y)} ones")
 
-# --- High-Risk Case Detection ---
-high_risk_cases = new_data[
-    (new_data["Glucose"] > 180) | 
-    (new_data["BMI"] > 30)
-]
-if not high_risk_cases.empty:
-    print("Potential high-risk cases:")
-    print(high_risk_cases)
-else:
-    print("No high-risk cases detected")
+# # --- High-Risk Case Detection ---
+# high_risk_cases = new_data[
+#     (new_data["Glucose"] > 180) | 
+#     (new_data["BMI"] > 30)
+# ]
+# if not high_risk_cases.empty:
+#     print("Potential high-risk cases:")
+#     print(high_risk_cases)
+# else:
+#     print("No high-risk cases detected")
