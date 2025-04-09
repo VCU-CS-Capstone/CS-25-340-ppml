@@ -59,6 +59,6 @@ def generate_diabetes_dataset(num_samples=1000):
 
 # Generate and save dataset
 diabetes_data = generate_diabetes_dataset(1000)
-diabetes_data.to_csv('./synthetic_diabetes.csv', index=False)
+diabetes_data.to_csv('../raw/user_data.csv', index=False)
 print("Generated dataset with distribution:")
 print(diabetes_data['Outcome'].value_counts(normalize=True))

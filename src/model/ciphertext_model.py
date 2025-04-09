@@ -17,6 +17,14 @@ X_mean = np.mean(X, axis=0)
 X_std = np.std(X, axis=0)
 X = (X - X_mean) / X_std
 
+# Save normaliation parameters
+norm_param = {
+    'mean': X_mean.tolist(),
+    'std': X_std.tolist()
+}
+with open('normalization_param.json', 'r') as f:
+    json.dump(norm_param, f, indent=4)
+
 # Split into federated clients
 n_clients = 5
 X_clients = np.array_split(X, n_clients)
@@ -30,6 +38,10 @@ context = ts.context(
 )
 context.global_scale = 2**40
 context.generate_galois_keys()
+
+# Save context for users to encrypt their input
+with open("tenseal_context.tenseal", "wb") as f:
+    f.write(context.serialize(save_public_key=True, save_secret_key=False))
 
 # --- Secure Model Storage ---
 def generate_key():
