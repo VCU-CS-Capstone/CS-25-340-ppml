@@ -44,7 +44,7 @@ Status Report Fall Week XX.md is a template for to copy-paste into new Status re
 | Week 10 Status Report | No meeting this week | Spring Break, everyone worked on it separately | no issues |
 | Week 11 Status Report | Abstract | Planning out the abstract and finishing the poster | no issues |
 | Week 12 Status Report | Abstract and Poster | Finishing up the abstract and poster to the given due date | no issues |
-| Week 13 Status Report | | | |
-| Week 14 Status Report | | | |
+| Week 13 Status Report | Front End | Establish a demo for a working front end to present at EXPO | no issues |
+| Week 14 Status Report | Meeting with professor| Met with the professor to clarify what to do at EXPO and how to present and explain our work. | no issues |
 | Week 15 Status Report | | | |
 | Week 16 Status Report | | | |
