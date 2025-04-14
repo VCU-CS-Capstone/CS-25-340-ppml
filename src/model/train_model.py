@@ -9,7 +9,7 @@ from sklearn.metrics import matthews_corrcoef
 import json
 
 # Load training data
-data = pd.read_csv("../data/raw/diabetes.csv")
+data = pd.read_csv("./data/raw/diabetes.csv")
 X = data.drop(columns=["Outcome"]).values
 y = data["Outcome"].values
 
@@ -23,9 +23,10 @@ norm_param = {
     'mean': X_mean.tolist(),
     'std': X_std.tolist()
 }
+json_obj = json.dumps(norm_param, indent=4)
 # Save to json file
-with open('./params/norm_param.json', 'r') as f:
-    json.dump(norm_param, f, indent=4)
+with open('./model/params/norm_param.json', 'w') as f:
+    f.write(json_obj)
 
 # Split into federated clients
 n_clients = 5
@@ -42,12 +43,12 @@ context.global_scale = 2**40
 context.generate_galois_keys()
 
 # Save context to file
-with open("./params/tenseal_context.tenseal", "wb") as f:
+with open("./model/params/tenseal_context.tenseal", "wb") as f:
     f.write(context.serialize(save_public_key=True, save_secret_key=False))
     
 # Federated Training with DP
 
-model_file = "encrypted_model.pkl"
+model_file = "./model/trained_model.pkl"
 if os.path.exists(model_file):
     try:
         with open(model_file, "rb") as f:
