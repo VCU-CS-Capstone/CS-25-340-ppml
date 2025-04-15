@@ -18,16 +18,6 @@ X_mean = np.mean(X, axis=0)
 X_std = np.std(X, axis=0)
 X = (X - X_mean) / X_std
 
-# Save normaliation parameters
-norm_param = {
-    'mean': X_mean.tolist(),
-    'std': X_std.tolist()
-}
-json_obj = json.dumps(norm_param, indent=4)
-# Save to json file
-with open('./model/params/norm_param.json', 'w') as f:
-    f.write(json_obj)
-
 # Split into federated clients
 n_clients = 5
 X_clients = np.array_split(X, n_clients)
@@ -47,7 +37,6 @@ with open("./model/params/tenseal_context.tenseal", "wb") as f:
     f.write(context.serialize(save_public_key=True, save_secret_key=False))
     
 # Federated Training with DP
-
 model_file = "./model/trained_model.pkl"
 if os.path.exists(model_file):
     try:
@@ -66,14 +55,14 @@ else:
     train_new_model = True
     
 if train_new_model:
-    # DP Parameters
+    # Differential Privacy Parameters
     noise_scale = 0.1
     clip_threshold = 1.0
     
     global_weights = np.zeros(X.shape[1])
     global_intercept = 0
     num_epochs = 70
-    
+        
     for epoch in range(num_epochs):
         weight_updates = []
         intercept_updates = []
@@ -101,6 +90,18 @@ if train_new_model:
         model = pickle.dumps((global_weights, global_intercept))
         f.write(model)
     print("Saved trained model.")
+    
+    # Save parameters
+    norm_param = {
+        'mean': X_mean.tolist(),
+        'std': X_std.tolist(),
+        'global_weights': global_weights.tolist(),
+        'global_intercept': global_intercept   
+    }
+
+    json_obj = json.dumps(norm_param, indent=4)
+    with open('./model/params/norm_param.json', 'w') as f:
+        f.write(json_obj)
     
 # Training Evaluation
 train_preds = (X @ global_weights + global_intercept) > 0.5

@@ -1,7 +1,7 @@
 import pandas as pd
 
-# Load
-user_data = "./data/raw/user_data.csv"
+# Load encrypted data
+user_data = "./data/encrypted_user_data"
 data = pd.read_csv(user_data)
 
 if "Outcome" in data.columns:
