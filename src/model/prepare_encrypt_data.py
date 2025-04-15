@@ -5,7 +5,7 @@ import pandas as pd
 # param paths
 norm_path = './model/params/norm_param.json'
 context_path = './model/params/tenseal_context.tenseal'
-data_path = './data/raw/user_data.csv'
+data_path = './data/user_data.csv'
 
 # load normalization parameter
 try:
@@ -19,12 +19,19 @@ try:
 except FileNotFoundError:
     print('param file not found')
     
-# load ckks context
-try:
-    with open(context_path, 'rb') as f:
-        context = ts.context_from(f.read())
-except FileNotFoundError:
-    print('context file not found')
+# CKKS encrpytion context
+context = ts.context(
+    ts.SCHEME_TYPE.CKKS,
+    poly_modulus_degree=8192,
+    coeff_mod_bit_sizes=[60, 40, 40, 60]
+)
+context.global_scale = 2**40
+context.generate_galois_keys()
+context.generate_relin_keys()
+
+# Save context to file
+with open("./model/params/tenseal_context.tenseal", "wb") as f:
+    f.write(context.serialize(save_public_key=True, save_secret_key=True))    
     
 user_data = pd.read_csv(data_path)
 if "Outcome" in user_data.columns:
@@ -49,7 +56,7 @@ encrypted_intercept = ts.ckks_vector(context, [global_intercept])
 
 # Save encrypted data to file
 try:
-    with open('./data/raw/encrypted_user_data', 'wb') as f:
+    with open('./data/encrypted_user_data', 'wb') as f:
         for encrypted_vector in encrypted_data:
             f.write(encrypted_vector.serialize())
     print(f"User data encrypted")

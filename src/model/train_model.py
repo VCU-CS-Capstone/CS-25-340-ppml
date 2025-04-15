@@ -9,7 +9,7 @@ from sklearn.metrics import matthews_corrcoef
 import json
 
 # Load training data
-data = pd.read_csv("./data/raw/diabetes.csv")
+data = pd.read_csv("./data/diabetes.csv")
 X = data.drop(columns=["Outcome"]).values
 y = data["Outcome"].values
 
@@ -22,19 +22,6 @@ X = (X - X_mean) / X_std
 n_clients = 5
 X_clients = np.array_split(X, n_clients)
 y_clients = np.array_split(y, n_clients)
-
-# CKKS encrpytion context
-context = ts.context(
-    ts.SCHEME_TYPE.CKKS,
-    poly_modulus_degree=8192,
-    coeff_mod_bit_sizes=[60, 40, 40, 60]
-)
-context.global_scale = 2**40
-context.generate_galois_keys()
-
-# Save context to file
-with open("./model/params/tenseal_context.tenseal", "wb") as f:
-    f.write(context.serialize(save_public_key=True, save_secret_key=False))
     
 # Federated Training with DP
 model_file = "./model/trained_model.pkl"

@@ -1,4 +1,4 @@
-Capstone
+capstone
 src/model/params/*
-src/data/*.csv
-!src/data/diabetes.csv
+src/data/user_data.csv
+src/data/encrypted_user_data
