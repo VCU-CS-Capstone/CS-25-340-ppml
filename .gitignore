@@ -2,3 +2,4 @@ capstone
 src/model/params/*
 src/data/user_data.csv
 src/data/encrypted_user_data
+src/data/encrypted_output
