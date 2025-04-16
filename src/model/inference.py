@@ -24,21 +24,19 @@ enc_weights = ts.ckks_vector(context, weights)
 enc_intercept = ts.ckks_vector(context, [intercept])
 
 # Load all encrypted user data from batch file
-with open("./data/encrypted_user_data/batch_vectors.pkl", "rb") as f:
+with open("./data/encrypted_user_data.pkl", "rb") as f:
     encrypted_rows = pickle.load(f)
-
 
 vectors = [ts.ckks_vector_from(context, row) for row in encrypted_rows]
 
 # Perform inference
-os.makedirs("./data/predictions", exist_ok=True)
-pred_paths = []
-for idx, enc_x in enumerate(vectors):
+all_preds = []
+for enc_x in vectors:
     pred = enc_x.dot(enc_weights) + enc_intercept
-    pred_bytes = pred.serialize()
-    path = f"./data/predictions/pred_{idx}.bin"
-    with open(path, "wb") as f:
-        f.write(pred_bytes)
-    pred_paths.append(path)
+    all_preds.append(pred.serialize())
 
-print(f"Saved {len(pred_paths)} encrypted predictions to ./data/predictions")
+# Save all encrypted predictions to one pkl
+with open("./data/encrypted_predictions.pkl", "wb") as f:
+    pickle.dump(all_preds, f)
+
+print(f"Saved {len(all_preds)} encrypted predictions to ./data/encrypted_predictions.pkl")

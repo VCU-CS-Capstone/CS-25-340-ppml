@@ -1,29 +1,29 @@
 import tenseal as ts
 import os
 import csv
+import pickle
 
 # Load encryption context
 with open("./model/params/context.ckks", "rb") as f:
     context = ts.context_from(f.read())
 
-# Load and decrypt predictions
-pred_folder = "./data/predictions"
-pred_files = sorted([f for f in os.listdir(pred_folder) if f.endswith(".bin")])
+# Load all encrypted predictions from batch .pkl file
+with open("./data/encrypted_predictions.pkl", "rb") as f:
+    encrypted_preds = pickle.load(f)
 
 zero_count = 0
 one_count = 0
 predictions = []
 
-for file in pred_files:
-    with open(os.path.join(pred_folder, file), "rb") as f:
-        enc_pred = ts.ckks_vector_from(context, f.read())
-        pred_value = enc_pred.decrypt()[0]
-        label = 1 if pred_value > 0.5 else 0
-        predictions.append((label, pred_value))
-        if label == 1:
-            one_count += 1
-        else:
-            zero_count += 1
+for idx, pred_bytes in enumerate(encrypted_preds):
+    enc_pred = ts.ckks_vector_from(context, pred_bytes)
+    pred_value = enc_pred.decrypt()[0]
+    label = 1 if pred_value > 0.5 else 0
+    predictions.append((label, pred_value))
+    if label == 1:
+        one_count += 1
+    else:
+        zero_count += 1
 
 print("Decrypted Predictions Summary:")
 print(f"Total 0s: {zero_count}")

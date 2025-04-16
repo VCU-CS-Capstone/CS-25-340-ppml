@@ -86,6 +86,7 @@ if train_new_model:
         'global_intercept': global_intercept   
     }
 
+    os.makedirs('./model/params', exist_ok=True)
     json_obj = json.dumps(norm_param, indent=4)
     with open('./model/params/norm_param.json', 'w') as f:
         f.write(json_obj)

@@ -62,7 +62,7 @@ def generate_diabetes_dataset(num_samples=1000):
     return data
 
 # Generate and save dataset
-diabetes_data = generate_diabetes_dataset(50)
+diabetes_data = generate_diabetes_dataset(500)
 diabetes_data.to_csv('./data/user_data.csv', index=False)
 print("Generated dataset with distribution:")
 print(diabetes_data['Outcome'].value_counts(normalize=True))

@@ -41,8 +41,7 @@ for row in normalized_data:
     batch_encrypted.append(enc_vec.serialize())
 
 # Save batch to a binary file using pickle
-os.makedirs("./data/encrypted_user_data", exist_ok=True)
-with open("./data/encrypted_user_data/batch_vectors.pkl", "wb") as f:
+with open("./data/encrypted_user_data.pkl", "wb") as f:
     pickle.dump(batch_encrypted, f)
 
-print(f"Encrypted and saved {len(batch_encrypted)} vectors to ./data/encrypted_user_data/batch_vectors.pkl")
+print(f"Encrypted and saved {len(batch_encrypted)} vectors to ./data/encrypted_user_data.pkl")
