@@ -25,7 +25,9 @@ This pipeline describes the workflow for:
 - **Script:** `./model/train_model.py`  
 - **Input:** `./data/raw/diabetes_real.csv`  
 - **Output:**  
-  - Trained model (saved as `./model/diabetes_model.pkl`).  
+  - Trained model (saved as `./model/diabetes_model.pkl`).
+  - Tenseal context (saved as `./model/ts_context.tenseal`)  
+  - Normalization Parameters (saved a `./model/norm_params.json`)
   - Optionally, normalized training data (if used).  
 
 #### **Example Command:**
@@ -39,29 +41,28 @@ python ./model/train_model.py
 - **Script:** `./data/scripts/synthetic_data_ds.py`  
 - **Output:**  
   - Raw synthetic data (`./data/raw/synthetic_diabetes.csv`).  
-  - (Optional) Normalized synthetic data (`./data/normalized/synthetic_diabetes_normalized.csv`).  
 
 #### **Example Command:**
 ```sh
 python ./data/scripts/synthetic_data_ds.py
 ```
 
-#### **Optional: Normalize Synthetic Data**
-- **Script:** `./data/scripts/normalize_data.py`  
-- **Input:** `./data/raw/synthetic_diabetes.csv`  
-- **Output:** `./data/normalized/synthetic_diabetes_normalized.csv`  
-
-```bash
-python ./data/scripts/normalize_data.py
-```
-
 ---
+
+### **Step 4: Encrypt user data
+- **Script:** `./scripts/encrypt_data.py`
+- **Input:**
+  - Tenseal context
+  - Normalization Parameters
+  - User data
+- **Output:**
+  - Encrypted user data
 
 ### **Step 4: Run Inference on Synthetic Data**
 - **Script:** `./model/ciphertext_model.py`  
 - **Input:**  
-  - Trained model (`./model/diabetes_model.pkl`).  
-  - Synthetic data (`./data/raw/synthetic_diabetes.csv` or `./data/normalized/synthetic_diabetes_normalized.csv`).  
+  - (Optional) Trained model (`./model/diabetes_model.pkl`).  
+  - Encrypted user data
 - **Output:** Predictions (e.g., `./model/predictions.csv`).  
 
 #### **Example Command:**

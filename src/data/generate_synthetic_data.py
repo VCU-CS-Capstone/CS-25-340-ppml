@@ -7,8 +7,8 @@ def generate_diabetes_dataset(num_samples=1000):
     # Base statistical parameters (inspired by real diabetes data)
     params = {
         'Pregnancies': {'mean': 3.8, 'std': 3.4, 'min': 0, 'max': 17},
-        'Glucose': {'mean': 120, 'std': 32, 'min': 0, 'max': 200},
-        'BloodPressure': {'mean': 69, 'std': 19, 'min': 0, 'max': 122},
+        'Glucose': {'mean': 120, 'std': 32, 'min': 40, 'max': 200},
+        'BloodPressure': {'mean': 69, 'std': 19, 'min': 40, 'max': 122},
         'SkinThickness': {'mean': 20, 'std': 16, 'min': 0, 'max': 99},
         'Insulin': {'mean': 80, 'std': 115, 'min': 0, 'max': 850},
         'BMI': {'mean': 32, 'std': 8, 'min': 0, 'max': 68},
@@ -51,6 +51,10 @@ def generate_diabetes_dataset(num_samples=1000):
     data['Glucose'] = data['Glucose'].apply(lambda x: max(x, 40))  # Minimum plausible glucose
     data['BMI'] = data['BMI'].apply(lambda x: max(x, 18))  # Minimum plausible BMI
     
+    # Truncation
+    data['DiabetesPedigreeFunction'] = data['DiabetesPedigreeFunction'].apply(lambda x: np.floor(x * 1000) / 1000)  # Truncate to 3 decimal places
+    data['BMI'] = data['BMI'].apply(lambda x: np.floor(x * 10) / 10)  # Truncate to 1 decimal place
+    
     # Ensure some clinical correlations
     data.loc[data['Glucose'] > 140, 'Outcome'] = 1
     data.loc[data['BMI'] > 35, 'Outcome'] = 1
@@ -58,7 +62,7 @@ def generate_diabetes_dataset(num_samples=1000):
     return data
 
 # Generate and save dataset
-diabetes_data = generate_diabetes_dataset(1000)
-diabetes_data.to_csv('./synthetic_diabetes.csv', index=False)
+diabetes_data = generate_diabetes_dataset(500)
+diabetes_data.to_csv('./data/user_data.csv', index=False)
 print("Generated dataset with distribution:")
 print(diabetes_data['Outcome'].value_counts(normalize=True))
