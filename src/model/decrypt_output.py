@@ -1,37 +1,38 @@
 import tenseal as ts
-import glob
-import pandas as pd  # Import pandas for better matrix printing
+import os
+import csv
 
-# Paths
-context_path = './model/params/tenseal_context.tenseal'
-output_dir = './data/encrypted_output'
-
-# Load context (with secret key)
-with open(context_path, 'rb') as f:
+# Load encryption context
+with open("./model/params/context.ckks", "rb") as f:
     context = ts.context_from(f.read())
 
-# Load encrypted predictions from individual .bin files
-encrypted_preds = []
-for file_path in sorted(glob.glob(f"{output_dir}/pred_*.bin")):
-    with open(file_path, 'rb') as f:
-        enc = ts.ckks_vector_from(context, f.read())
-        encrypted_preds.append(enc)
+# Load and decrypt predictions
+pred_folder = "./data/predictions"
+pred_files = sorted([f for f in os.listdir(pred_folder) if f.endswith(".bin")])
 
-if not encrypted_preds:
-    raise ValueError("❌ No encrypted predictions were loaded.")
+zero_count = 0
+one_count = 0
+predictions = []
 
-# Decrypt predictions
-decrypted_preds = [vec.decrypt()[0] for vec in encrypted_preds]
-classified_preds = [1 if pred > 0.5 else 0 for pred in decrypted_preds]
+for file in pred_files:
+    with open(os.path.join(pred_folder, file), "rb") as f:
+        enc_pred = ts.ckks_vector_from(context, f.read())
+        pred_value = enc_pred.decrypt()[0]
+        label = 1 if pred_value > 0.5 else 0
+        predictions.append((label, pred_value))
+        if label == 1:
+            one_count += 1
+        else:
+            zero_count += 1
 
-# Create a DataFrame to print the results as a matrix
-df = pd.DataFrame({
-    'Sample': range(1, len(decrypted_preds) + 1),
-    'Decrypted Prediction (Logits)': decrypted_preds,
-    'Classified Prediction (Threshold = 0.5)': classified_preds
-})
+print("Decrypted Predictions Summary:")
+print(f"Total 0s: {zero_count}")
+print(f"Total 1s: {one_count}")
 
-# Print the matrix (DataFrame)
-print("\nDecrypted and Classified Predictions Matrix:")
-print(df)
-
+# Save to CSV for frontend use
+os.makedirs("./model", exist_ok=True)
+with open("./model/predictions.csv", "w", newline="") as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(["Prediction", "Score"])
+    for label, score in predictions:
+        writer.writerow([label, round(score, 4)])

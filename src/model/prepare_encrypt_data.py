@@ -1,46 +1,48 @@
-import json
 import tenseal as ts
 import pandas as pd
+import pickle
 import os
-
-# Paths
-norm_path = './model/params/norm_param.json'
-context_path = './model/params/tenseal_context.tenseal'
-data_path = './data/user_data.csv'
-output_folder = './data/encrypted_user_data'
-
-os.makedirs(output_folder, exist_ok=True)
+import json
 
 # Load normalization parameters
-with open(norm_path, 'r') as f:
-    norm = json.load(f)
-X = norm['mean']
-std = norm['std']
+with open("./model/params/norm_param.json", "r") as f:
+    params = json.load(f)
+mean = params["mean"]
+std = params["std"]
 
-# Create TenSEAL context
+# Load input user data
+input_path = "./data/user_data.csv"
+df = pd.read_csv(input_path)
+if "Outcome" in df.columns:
+    df = df.drop(columns=["Outcome"])
+data = df.values
+
+# Normalize data
+normalized_data = (data - mean) / std
+
+# Create encryption context
 context = ts.context(
     ts.SCHEME_TYPE.CKKS,
     poly_modulus_degree=8192,
-    coeff_mod_bit_sizes=[40, 30, 30, 40]
+    coeff_mod_bit_sizes=[60, 40, 40, 60]
 )
-context.global_scale = 2 ** 40
+context.global_scale = 2**40
 context.generate_galois_keys()
-context.generate_relin_keys()
 
 # Save context
-with open(context_path, 'wb') as f:
-    f.write(context.serialize(save_public_key=True, save_secret_key=True))
+os.makedirs("./model/params", exist_ok=True)
+with open("./model/params/context.ckks", "wb") as f:
+    f.write(context.serialize(save_secret_key=True))
 
-# Normalize data
-df = pd.read_csv(data_path)
-if "Outcome" in df.columns:
-    df = df.drop(columns=["Outcome"])
-data = ((df - X) / std).values
-
-# Encrypt and save each row
-for idx, row in enumerate(data):
+# Encrypt each row and collect into a batch
+batch_encrypted = []
+for row in normalized_data:
     enc_vec = ts.ckks_vector(context, row)
-    with open(f"{output_folder}/vector_{idx}.bin", 'wb') as f:
-        f.write(enc_vec.serialize())
+    batch_encrypted.append(enc_vec.serialize())
 
-print(f"✅ Encrypted {len(data)} vectors saved to {output_folder}")
+# Save batch to a binary file using pickle
+os.makedirs("./data/encrypted_user_data", exist_ok=True)
+with open("./data/encrypted_user_data/batch_vectors.pkl", "wb") as f:
+    pickle.dump(batch_encrypted, f)
+
+print(f"Encrypted and saved {len(batch_encrypted)} vectors to ./data/encrypted_user_data/batch_vectors.pkl")
