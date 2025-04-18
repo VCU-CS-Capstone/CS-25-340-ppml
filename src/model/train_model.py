@@ -9,7 +9,7 @@ from sklearn.metrics import matthews_corrcoef
 import json
 
 # Load training data
-data = pd.read_csv("./data/diabetes.csv")
+data = pd.read_csv("../data/diabetes.csv")
 X = data.drop(columns=["Outcome"]).values
 y = data["Outcome"].values
 
