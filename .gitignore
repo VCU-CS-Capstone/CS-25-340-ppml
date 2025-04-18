@@ -1,2 +1,5 @@
 capstone
 src/model/params/*
+src/data/encrypted*
+src/model/trained_model.pkl
+src/model/predictions.csv
