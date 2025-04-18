@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import pickle
 import os
-from cryptography.fernet import Fernet, InvalidToken
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import matthews_corrcoef
+from sklearn.preprocessing import PolynomialFeatures
 import json
 
 # Load training data
@@ -18,11 +18,15 @@ X_mean = np.mean(X, axis=0)
 X_std = np.std(X, axis=0)
 X = (X - X_mean) / X_std
 
+# Polynomial expansion
+poly = PolynomialFeatures(degree=2, include_bias=False)
+X_poly = poly.fit_transform(X)
+
 # Split into federated clients
 n_clients = 5
-X_clients = np.array_split(X, n_clients)
+X_clients = np.array_split(X_poly, n_clients)
 y_clients = np.array_split(y, n_clients)
-    
+
 # Federated Training
 model_file = "./model/trained_model.pkl"
 if os.path.exists(model_file):
@@ -31,7 +35,7 @@ if os.path.exists(model_file):
             model = f.read()
         global_weights, global_intercept = pickle.loads(model)
         print("Loaded pre-trained model.")
-    except (InvalidToken, pickle.UnpicklingError):
+    except (pickle.UnpicklingError, Exception):
         print("Invalid model file. Training new model...")
         os.remove(model_file)
         train_new_model = True
@@ -40,51 +44,51 @@ if os.path.exists(model_file):
 else:
     print("No pre-trained model found. Training a new one...")
     train_new_model = True
-    
+
 if train_new_model:
-    
-    global_weights = np.zeros(X.shape[1])
+    global_weights = np.zeros(X_poly.shape[1])
     global_intercept = 0
     num_epochs = 70
-        
+
     for epoch in range(num_epochs):
         weight_updates = []
         intercept_updates = []
-        
+
         for X_client, y_client in zip(X_clients, y_clients):
             model = LogisticRegression(max_iter=1000)
             model.fit(X_client, y_client)
-            
+
             weights = model.coef_[0]
             intercept = model.intercept_[0]
 
             weight_updates.append(weights)
             intercept_updates.append(intercept)
-        
-        # Aggregate updates
+
         global_weights = np.mean(weight_updates, axis=0)
         global_intercept = np.mean(intercept_updates)
-        
+
     # Save model
     with open(model_file, "wb") as f:
         model = pickle.dumps((global_weights, global_intercept))
         f.write(model)
     print("Saved trained model.")
-    
+
     # Save parameters
     norm_param = {
         'mean': X_mean.tolist(),
         'std': X_std.tolist(),
         'global_weights': global_weights.tolist(),
-        'global_intercept': global_intercept   
+        'global_intercept': global_intercept
     }
 
     os.makedirs('./model/params', exist_ok=True)
-    json_obj = json.dumps(norm_param, indent=4)
     with open('./model/params/norm_param.json', 'w') as f:
-        f.write(json_obj)
-    
+        json.dump(norm_param, f, indent=4)
+
+    with open('./model/params/poly_transformer.pkl', 'wb') as f:
+        pickle.dump(poly, f)
+
 # Training Evaluation
-train_preds = (X @ global_weights + global_intercept) > 0.5
+train_preds = (X_poly @ global_weights + global_intercept) > 0.5
 train_mcc = matthews_corrcoef(y, train_preds)
 print(f"MCC on training set: {train_mcc:.4f}")
