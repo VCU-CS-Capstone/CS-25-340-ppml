@@ -23,7 +23,7 @@ n_clients = 5
 X_clients = np.array_split(X, n_clients)
 y_clients = np.array_split(y, n_clients)
     
-# Federated Training with DP
+# Federated Training
 model_file = "./model/trained_model.pkl"
 if os.path.exists(model_file):
     try:
