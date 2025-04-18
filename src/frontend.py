@@ -18,6 +18,12 @@ st.set_page_config(page_title="PPML Diabetes Predictor", layout="wide")
 st.title("🔒 Privacy-Preserving Diabetes Prediction")
 st.markdown("Upload encrypted patient data to run secure predictions using a federated, privacy-preserving model.")
 
+# Initialize session state
+if 'inference_done' not in st.session_state:
+    st.session_state.inference_done = False
+if 'decryption_done' not in st.session_state:
+    st.session_state.decryption_done = False
+
 # Sidebar
 with st.sidebar:
     st.header("About This Project")
@@ -39,36 +45,48 @@ encrypted_file = st.file_uploader("Upload encrypted batch_vectors.pkl", type=["p
 # Upload the original (unencrypted) data used for encryption for analysis/visualization only
 reference_csv = st.file_uploader("Upload original CSV used for encryption (optional, for visualization only)", type=["csv"])
 
-if encrypted_file is not None:
-    with open("./data/encrypted_user_data.pkl", "wb") as f:
-        f.write(encrypted_file.getbuffer())
-    st.success("Encrypted data uploaded successfully.")
+model_exists = os.path.exists("./model/trained_model.pkl")
 
-    # Run inference
-    progress_text = "Running encrypted inference..."
-    with st.status(progress_text) as status:
-        result = subprocess.run(["python", "./model/inference.py"], capture_output=True, text=True)
-        if result.returncode != 0:
-            st.error("❌ Error during inference")
-            st.code(result.stderr)
-            status.update(label="Inference failed", state="error")
-        else:
-            st.success("✅ Inference completed successfully")
-            status.update(label="Inference completed successfully", state="complete")
+if encrypted_file is not None and model_exists:
+    if not st.session_state.inference_done:
+        with open("./data/encrypted_user_data.pkl", "wb") as f:
+            f.write(encrypted_file.getbuffer())
+        st.success("Encrypted data uploaded successfully.")
 
-    # Run decryption
-    progress_text = "Decrypting predictions..."
-    with st.status(progress_text) as status:
-        result = subprocess.run(["python", "./model/decrypt_output.py"], capture_output=True, text=True)
-        if result.returncode != 0:
-            st.error("❌ Error decrypting predictions")
-            st.code(result.stderr)
-            status.update(label="Decryption failed", state="error")
-        else:
-            st.success("✅ Predictions decrypted successfully")
-            status.update(label="Predictions decrypted successfully", state="complete")
+        # Run inference
+        progress_text = "Running encrypted inference..."
+        with st.status(progress_text) as status:
+            result = subprocess.run(["python", "./model/inference.py"], capture_output=True, text=True)
+            if result.returncode != 0:
+                st.error("❌ Error during inference")
+                st.code(result.stderr)
+                status.update(label="Inference failed", state="error")
+            else:
+                st.success("✅ Inference completed successfully")
+                status.update(label="Inference completed successfully", state="complete")
+                st.session_state.inference_done = True
+
+    if st.session_state.inference_done and not st.session_state.decryption_done:
+        # Run decryption
+        progress_text = "Decrypting predictions..."
+        with st.status(progress_text) as status:
+            result = subprocess.run(["python", "./model/decrypt.py"], capture_output=True, text=True)
+            if result.returncode != 0:
+                st.error("❌ Error decrypting predictions")
+                st.code(result.stderr)
+                status.update(label="Decryption failed", state="error")
+            else:
+                st.success("✅ Predictions decrypted successfully")
+                status.update(label="Predictions decrypted successfully", state="complete")
+                st.session_state.decryption_done = True
 
     # Load and display predictions if available
+    # Show MCC value if available
+    mcc_file_path = "./model/train_mcc.txt"
+    if os.path.exists(mcc_file_path):
+        with open(mcc_file_path, "r") as f:
+            mcc_score = f.read().strip()
+        st.info(f"**MCC of trained model:** {mcc_score}")
     if os.path.exists("./model/predictions.csv"):
         preds_df = pd.read_csv("./model/predictions.csv")
         st.subheader("🔍 Prediction Results")
@@ -122,5 +140,16 @@ if encrypted_file is not None:
         csv = preds_df.to_csv(index=False)
         st.download_button("Download Prediction Results", data=csv, file_name="predictions.csv", mime="text/csv")
 
+elif not model_exists:
+    st.warning("⚠️ Trained model not found. Running training now...")
+    with st.spinner("Training model..."):
+        result = subprocess.run(["python", "./model/train.py"], capture_output=True, text=True)
+        if result.returncode != 0:
+            st.error("❌ Model training failed.")
+            st.code(result.stderr)
+        else:
+            st.success("✅ Model trained successfully. Please re-upload the encrypted file to begin inference.")
+            st.session_state.inference_done = False
+            st.session_state.decryption_done = False
 else:
     st.info("Awaiting encrypted input file for prediction.")

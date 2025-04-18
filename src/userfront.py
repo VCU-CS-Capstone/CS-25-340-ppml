@@ -11,8 +11,8 @@ Encrypt your health data using homomorphic encryption before sending it to the p
 
 **Steps:**
 1. Upload your CSV file
-2. Ensure `norm_param.json` is in `./model/params/`
-3. Click to encrypt your data into `batch_vectors.pkl`
+2. Ensure `param.pkl` is in `./model/params/`
+3. Click to encrypt your data into `encrypted_user_data.pkl`
 """)
 
 # Sidebar
@@ -20,7 +20,7 @@ with st.sidebar:
     st.header("Encryption Requirements")
     st.markdown("""
     Before you can encrypt:
-    - Download `norm_param.json` from the model server
+    - Download `params.pkl` from the model server
     - Place it in the `./model/params/` directory
     - The encryption context (`context.ckks`) will be generated automatically
     """)
@@ -38,14 +38,14 @@ if uploaded_csv is not None:
     st.success("CSV saved to ./data/user_data.csv")
 
     # Check if norm_param.json exists
-    norm_exists = os.path.exists("./model/params/norm_param.json")
+    norm_exists = os.path.exists("./model/params/params.pkl")
 
     if not norm_exists:
-        st.error("Missing required file: norm_param.json")
+        st.error("Missing required file: params.pkl")
     else:
         if st.button("🔐 Encrypt Data"):
             with st.spinner("Encrypting your data..."):
-                result = subprocess.run(["python", "./model/prepare_encrypt_data.py"], capture_output=True, text=True)
+                result = subprocess.run(["python", "./model/encrypt.py"], capture_output=True, text=True)
                 if result.returncode != 0:
                     st.error("Encryption failed:")
                     st.code(result.stderr)

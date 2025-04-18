@@ -1,6 +1,5 @@
 import tenseal as ts
 import pickle
-import json
 import os
 
 # Ensure the context file exists
@@ -12,12 +11,12 @@ if not os.path.exists(context_path):
 with open(context_path, "rb") as f:
     context = ts.context_from(f.read())
 
-# Load model weights and normalization params
-with open("./model/params/norm_param.json", "r") as f:
-    model_data = json.load(f)
+# Load full model bundle (weights, intercept)
+with open("./model/params/params.pkl", "rb") as f:
+    model_bundle = pickle.load(f)
 
-weights = model_data["global_weights"]
-intercept = model_data["global_intercept"]
+weights = model_bundle["weights"]
+intercept = model_bundle["intercept"]
 
 # Encrypt model weights
 enc_weights = ts.ckks_vector(context, weights)
