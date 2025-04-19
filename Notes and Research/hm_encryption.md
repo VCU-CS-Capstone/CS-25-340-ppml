@@ -1,50 +1,107 @@
 # Homomorphic Encryption
 
-Homomorphic encryption (HE) is a form of encryption that allows computation on encrypted data without needing to decrypt it first. This makes it particularly useful in privacy-preserving machine learning and cloud computing, as it enables the performance of complex operations on sensitive data without exposing it to unauthorized parties.
+Homomorphic encryption (HE) enables computation on ciphertexts, producing encrypted results that decrypt to the same output as if operations were performed on plaintext. This property is essential for privacy-preserving applications where data must remain confidential.
 
-## Encryption & Decryption
+---
 
-* Data is encrypted using a public key, and anyone with this public key can perform computations on the ciphertext.
-* Only the holder of the private key can decrypt the result of the computation to retrieve the output in plaintext.
+## 1. Basic Workflow
 
-## Types of Homomorphic Encryption
+1. **Key Generation**: Generate a public/private key pair.
+2. **Encryption**: Encrypt plaintext data with the public key → ciphertext.
+3. **Evaluation**: Perform arithmetic operations (addition, multiplication) directly on ciphertexts.
+4. **Decryption**: Private key holder decrypts the evaluated ciphertext to retrieve the result.
 
-### Partially Homomorphic Encryption (PHE)
+```text
+Enc(m₁) = c₁  Enc(m₂) = c₂
+Enc(m₁ + m₂) = c₁ ⊕ c₂   // homomorphic addition
+Enc(m₁ ⋅ m₂) = c₁ ⊗ c₂   // homomorphic multiplication
+Dec(c_eval) = m_eval
+```  
 
-Supports only one operation (either addition or multiplication) on ciphertexts. For example:
+---
 
-* RSA and ElGamal support multiplication.
-* Paillier supports addition.
- 
-### Somewhat Homomorphic Encryption (SHE)
+## 2. HE Scheme Types
 
-Supports a limited number of additions and multiplications.
+| Scheme       | Operations Supported        | Typical Use Cases                |
+|--------------|-----------------------------|----------------------------------|
+| **PHE**      | Add _or_ Mul                | Simple summation or product      |
+| **SHE**      | Limited depth of both ops   | Fixed-depth polynomial eval      |
+| **Leveled HE** | Both ops up to a predefined multiplicative depth | ML inference with known depth    |
+| **FHE**      | Unbounded additions & multiplications via bootstrapping | Complex circuits, arbitrary programs |
 
-### Fully Homomorphic Encryption (FHE)
+### 2.1 Partially Homomorphic Encryption (PHE)
+- **Addition**: Paillier, BFV without multiplication
+- **Multiplication**: RSA, ElGamal
 
-Supports arbitrary numbers of both addition and multiplication operations, allowing complex computations on encrypted data. This is the most powerful form but also the most computationally expensive.
+### 2.2 Somewhat & Leveled HE (SHE)
+- Fixed-depth circuits; no expensive bootstrapping
+- Used when multiplicative depth is known in advance
 
-## Key Applications
+### 2.3 Fully Homomorphic Encryption (FHE)
+- **Bootstrapping**: Refresh ciphertext noise to allow unlimited operations
+- Examples: Gentry’s scheme, BGV, CKKS, TFHE
 
-* **Privacy-Preserving Machine Learning:** Enables training or inference on encrypted datasets, allowing machine learning models to work with sensitive data without ever revealing it.
-* **Cloud Computing:** Allows users to outsource the storage and computation of encrypted data to the cloud while maintaining full privacy over the contents.
-* **Secure Voting Systems:** Homomorphic encryption can be used to securely tally encrypted votes without exposing individual votes.
+---
 
-## Advantages
+## 3. Scheme Components
 
-* **Data Confidentiality:** Computations can be performed on data without exposing it to third parties, such as cloud providers.
-* **Security in Untrusted Environments:** Enables secure computations in environments where the data owner cannot fully trust the service provider.
+1. **Plaintext Space**: Ring or vector space where messages live.
+2. **Ciphertext Space**: Structured noise-bearing ring elements.
+3. **Key Generation**:
+   - `sk, pk = KeyGen()`
+   - Bootstrapping keys for FHE refresh.
+4. **Encryption**:
+   - `c = Encrypt(pk, m)`
+5. **Evaluation**:
+   - `c_add = Add(c₁, c₂)`
+   - `c_mul = Multiply(c₁, c₂)`
+   - `c_rescale` / `c_relinearize` for scale management (CKKS).
+6. **Decryption**:
+   - `m = Decrypt(sk, c)`
 
-## Challenges
+---
 
-* **Performance:** Fully Homomorphic Encryption (FHE) is computationally intensive and has high overhead in terms of processing time and storage.
-* **Complexity:** Implementing FHE is much more complex than traditional encryption due to the number of supported operations and the need to ensure security against various types of attacks.
+## 4. CKKS Scheme for Approximate Arithmetic
 
-## Examples of Homomorphic Encryption Schemes:
+- **Approximate HE**: Encodes real numbers as fixed-point values
+- **Rescaling**: Maintains scale after multiplication
+- **Applications**: Machine learning on floating-point data
+- **Key Operations**: `rescale`, `relinearize`, `rotate` (for SIMD batching)
 
-* **BFV (Brakerski/Fan-Vercauteren):** A widely used FHE scheme, which is more practical for real-world applications. It supports both additive and multiplicative homomorphisms.
-* **CKKS (Cheon-Kim-Kim-Song):** Specializes in approximate arithmetic on encrypted data and is suited for machine learning tasks that require floating-point numbers.
+---
 
-## Use in Privacy-Preserving Machine Learning:
+## 5. Performance Considerations
 
-Homomorphic encryption can be used to enable operations on encrypted datasets during the training or inference phase of a machine learning model. For example, a model can compute on encrypted data (like patient records or financial data) without ever decrypting it. This preserves the privacy of the underlying sensitive information while allowing valuable insights to be extracted.
+- **Noise Growth**: Controlled by scheme parameters and bootstrapping
+- **Ciphertext Size**: Trade-off between security and speed
+- **Bootstrapping Cost**: High overhead; use leveled HE when possible
+- **Parallelization**: Use SIMD slots to pack many values in one ciphertext
+- **Parameter Selection**: Balance security level (e.g., 128-bit) and multiplicative depth
+
+---
+
+## 6. Practical Libraries & Tools
+
+- **Microsoft SEAL / TenSEAL**: CKKS, BFV support, easy C++/Python APIs
+- **HElib**: BGV scheme, C++ library by IBM
+- **PALISADE**: BFV, CKKS, BGV, includes FHEW and TFHE modules
+- **TFHE**: Fast bootstrapping for boolean circuits
+
+---
+
+## 7. Use Cases in PPML
+
+- **Encrypted Inference**: Perform neural network or logistic regression inference on ciphertexts
+- **Secure Aggregation**: Sum encrypted model updates in federated learning
+- **Private Querying**: Search or statistical queries on encrypted databases
+
+---
+
+## 8. Best Practices
+
+- **Parameter Tuning**: Choose appropriate `poly_modulus_degree`, `coeff_mod_bit_sizes` for noise budget
+- **Minimize Bootstrapping**: Use leveled HE for known-depth tasks
+- **Use SIMD Packing**: Batch operations for throughput
+- **Keep Secret Key Offline**: Only public key and evaluation keys distributed
+
+---
