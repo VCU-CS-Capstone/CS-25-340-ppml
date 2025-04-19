@@ -22,7 +22,7 @@ poly = PolynomialFeatures(degree=2, include_bias=False)
 X_poly = poly.fit_transform(X)
 
 # Split into federated clients
-n_clients = 5
+n_clients = 1 # No federeated learning for now
 X_clients = np.array_split(X_poly, n_clients)
 y_clients = np.array_split(y, n_clients)
 
