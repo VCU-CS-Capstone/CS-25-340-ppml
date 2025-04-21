@@ -195,9 +195,7 @@ if st.session_state.predictions_loaded:
     with col2:
         st.metric("Diabetic predictions (1)", st.session_state.one_count)
     
-    # Display data with predictions
-    st.subheader("Data with Predictions")
-    st.dataframe(st.session_state.df_with_preds)
+    
     
     # Download button for results
     csv = st.session_state.df_with_preds.to_csv(index=False)
