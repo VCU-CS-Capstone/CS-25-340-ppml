@@ -51,19 +51,23 @@ if uploaded:
         st.success("Using provided encrypted data.")
 
     # Submit for inference
-    if st.button("🔄 Submit for Inference"):
-        with st.spinner("Sending encrypted data to server..."):
-            with open(in_path, "rb") as f:
-                files = {"encrypted": ("encrypted_user_data.pkl", f, "application/octet-stream")}
-                resp = requests.post(f"{SERVER_URL}/predict/", files=files)
-        if resp.status_code == 200:
-            out_path = os.path.join("./data", "encrypted_predictions.pkl")
-            with open(out_path, "wb") as f:
-                f.write(resp.content)
-            st.success("Encrypted predictions received.")
-        else:
-            st.error(f"Server error {resp.status_code}:")
-            st.code(resp.text)
+if st.button("🔄 Submit for Inference"):
+    with st.spinner("Sending encrypted data and public context to server..."):
+        # Open both files
+        with open(in_path, "rb") as f_data, open("./model/params/context_public.ckks", "rb") as f_ctx:
+            files = {
+                "encrypted": ("encrypted_user_data.pkl", f_data, "application/octet-stream"),
+                "context":   ("context_public.ckks",      f_ctx,  "application/octet-stream"),
+            }
+            resp = requests.post(f"{SERVER_URL}/predict/", files=files)
+    if resp.status_code == 200:
+        out_path = os.path.join("./data", "encrypted_predictions.pkl")
+        with open(out_path, "wb") as f:
+            f.write(resp.content)
+        st.success("Encrypted predictions received.")
+    else:
+        st.error(f"Server error {resp.status_code}:")
+        st.code(resp.text)
 
     # Decrypt predictions
     if os.path.exists("./data/encrypted_predictions.pkl"):

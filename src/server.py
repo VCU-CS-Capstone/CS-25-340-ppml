@@ -5,12 +5,11 @@ import os
 import subprocess
 
 app = FastAPI()
-
 MODEL_DIR   = "./model"
 DATA_DIR    = "./data"
-MODEL_FILE  = os.path.join(MODEL_DIR, "trained_model.pkl")
 PARAMS_PATH = os.path.join(MODEL_DIR, "params.pkl")
-
+CONTEXT_PATH= os.path.join(MODEL_DIR, "params", "context_public.ckks")
+MODEL_FILE  = os.path.join(MODEL_DIR, "trained_model.pkl")
 
 def ensure_model():
     os.makedirs(MODEL_DIR, exist_ok=True)
@@ -43,7 +42,10 @@ for route in ("/params", "/params/"):
 
 
 @app.post("/predict/")
-async def predict(encrypted: UploadFile = File(...)):
+async def predict(
+    encrypted: UploadFile = File(...),
+    context:    UploadFile = File(...)   # <-- now accepts `context`
+):
     ensure_model()
 
     # 1) save incoming encrypted_user_data.pkl
@@ -52,17 +54,22 @@ async def predict(encrypted: UploadFile = File(...)):
     with open(enc_in, "wb") as f:
         f.write(await encrypted.read())
 
-    # 2) run inference.py
+    # 2) save the public context
+    os.makedirs(os.path.dirname(CONTEXT_PATH), exist_ok=True)
+    with open(CONTEXT_PATH, "wb") as f:
+        f.write(await context.read())
+
+    # 3) run inference.py (it will now find context_public.ckks)
     result = subprocess.run(
-        ["python", "inference.py"],
-        cwd=MODEL_DIR,
+        ["python", "./model/inference.py"],
+        cwd='.',
         capture_output=True,
         text=True
     )
     if result.returncode != 0:
         raise HTTPException(500, detail=f"Inference failed:\n{result.stderr}")
 
-    # 3) return the encrypted predictions bundle
+    # 4) return the encrypted predictions bundle
     enc_out = os.path.join(DATA_DIR, "encrypted_predictions.pkl")
     if not os.path.exists(enc_out):
         raise HTTPException(500, detail="Encrypted predictions not found")
@@ -71,7 +78,6 @@ async def predict(encrypted: UploadFile = File(...)):
         media_type="application/octet-stream",
         filename="encrypted_predictions.pkl"
     )
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
