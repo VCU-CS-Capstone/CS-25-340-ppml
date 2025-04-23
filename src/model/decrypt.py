@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 # Load encryption context
-with open("./model/params/context.ckks", "rb") as f:
+with open("./model/params/context_private.ckks", "rb") as f:
     context = ts.context_from(f.read())
 
 # Load all encrypted predictions from batch .pkl file

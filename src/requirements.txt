@@ -1,4 +1,4 @@
-streamlit
+# Machine learning and encryption libraries
 pandas
 numpy
 matplotlib
@@ -6,3 +6,9 @@ seaborn
 scikit-learn
 tenseal
 cryptography
+
+# client-serve front end libraries
+streamlit
+fastapi
+uvicorn
+python-multipart

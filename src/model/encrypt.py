@@ -36,7 +36,11 @@ context.generate_galois_keys()
 
 # Save context
 os.makedirs("./model/params", exist_ok=True)
-with open("./model/params/context.ckks", "wb") as f:
+with open("./model/params/context_public.ckks", "wb") as f:
+    f.write(context.serialize())
+
+# Save key
+with open("./model/params/context_private.ckks", "wb") as f:
     f.write(context.serialize(save_secret_key=True))
 
 # Encrypt each row and collect into a batch

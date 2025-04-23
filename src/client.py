@@ -2,57 +2,84 @@ import streamlit as st
 import pandas as pd
 import subprocess
 import os
+import requests
 
-st.set_page_config(page_title="PPML Client Encryption", layout="wide")
+# Server endpoint
+SERVER_URL = "http://localhost:8000"
 
-st.title("🛡️ Client-Side Data Encryption")
-st.markdown("""
-Encrypt your health data using homomorphic encryption before sending it to the prediction server.
+# Streamlit setup
+st.set_page_config(page_title="PPML Client", layout="wide")
+st.title("🛡️ PPML Client")
 
-**Steps:**
-1. Upload your CSV file
-2. Ensure `param.pkl` is in `./model/params/`
-3. Click to encrypt your data into `encrypted_user_data.pkl`
-""")
-
-# Sidebar
-with st.sidebar:
-    st.header("Encryption Requirements")
-    st.markdown("""
-    Before you can encrypt:
-    - Download `params.pkl` from the model server
-    - Place it in the `./model/params/` directory
-    - The encryption context (`context.ckks`) will be generated automatically
-    """)
-
+# Ensure directories
 os.makedirs("./data", exist_ok=True)
 os.makedirs("./model/params", exist_ok=True)
 
-uploaded_csv = st.file_uploader("Upload CSV file to encrypt:", type=["csv"])
+# Download params.pkl if not present
+if not os.path.exists("./model/params/params.pkl"):
+    with st.spinner("Downloading encryption parameters..."):
+        resp = requests.get(f"{SERVER_URL}/params/")
+        if resp.status_code == 200:
+            with open("./model/params/params.pkl", "wb") as f:
+                f.write(resp.content)
+            st.success("params.pkl downloaded.")
+        else:
+            st.error(f"Failed to fetch params: {resp.status_code}")
 
-if uploaded_csv is not None:
-    df = pd.read_csv(uploaded_csv)
-    st.subheader("📋 Data Preview")
-    st.dataframe(df.head())
-    df.to_csv("./data/user_data.csv", index=False)
-    st.success("CSV saved to ./data/user_data.csv")
+# File uploader: CSV or encrypted .pkl
+uploaded = st.file_uploader("Upload your data (CSV or encrypted .pkl):", type=["csv", "pkl"])
+if uploaded:
+    file_path = os.path.join("./data", uploaded.name)
+    with open(file_path, "wb") as f:
+        f.write(uploaded.getbuffer())
+    st.success(f"Saved {uploaded.name}.")
 
-    # Check if norm_param.json exists
-    norm_exists = os.path.exists("./model/params/params.pkl")
-
-    if not norm_exists:
-        st.error("Missing required file: params.pkl")
+    # Encrypt if CSV
+    if uploaded.name.lower().endswith(".csv"):
+        enc = subprocess.run(
+            ["python", "./model/encrypt.py"],
+            capture_output=True, text=True
+        )
+        if enc.returncode != 0:
+            st.error("Encryption failed:")
+            st.code(enc.stderr)
+            st.stop()
+        st.success("Data encrypted to encrypted_user_data.pkl.")
+        in_path = "./data/encrypted_user_data.pkl"
     else:
-        if st.button("🔐 Encrypt Data"):
-            with st.spinner("Encrypting your data..."):
-                result = subprocess.run(["python", "./model/encrypt.py"], capture_output=True, text=True)
-                if result.returncode != 0:
-                    st.error("Encryption failed:")
-                    st.code(result.stderr)
-                else:
-                    st.success("✅ Data encrypted successfully!")
-                    st.markdown("Download your encrypted file to submit to the prediction server:")
-                    with open("./data/encrypted_user_data.pkl", "rb") as f:
-                        st.download_button("Download encrypted_user_data.pkl", data=f, file_name="encrypted_user_data.pkl")
-else:
-    st.info("Awaiting CSV file to begin encryption.")
+        in_path = file_path
+        st.success("Using provided encrypted data.")
+
+    # Submit for inference
+    if st.button("🔄 Submit for Inference"):
+        with st.spinner("Sending encrypted data to server..."):
+            with open(in_path, "rb") as f:
+                files = {"encrypted": ("encrypted_user_data.pkl", f, "application/octet-stream")}
+                resp = requests.post(f"{SERVER_URL}/predict/", files=files)
+        if resp.status_code == 200:
+            out_path = os.path.join("./data", "encrypted_predictions.pkl")
+            with open(out_path, "wb") as f:
+                f.write(resp.content)
+            st.success("Encrypted predictions received.")
+        else:
+            st.error(f"Server error {resp.status_code}:")
+            st.code(resp.text)
+
+    # Decrypt predictions
+    if os.path.exists("./data/encrypted_predictions.pkl"):
+        if st.button("🔓 Decrypt Predictions"):
+            dec = subprocess.run(
+                ["python", "./model/decrypt.py"],
+                capture_output=True, text=True
+            )
+            if dec.returncode != 0:
+                st.error("Decryption failed:")
+                st.code(dec.stderr)
+            else:
+                st.success("Decryption succeeded.")
+                df = pd.read_csv("./model/predictions.csv")
+                st.subheader("Predictions:")
+                st.dataframe(df)
+                st.download_button(
+                    "Download predictions.csv", df.to_csv(index=False), "predictions.csv", "text/csv"
+                )

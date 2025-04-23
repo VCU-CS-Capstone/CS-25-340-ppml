@@ -3,7 +3,7 @@ import pickle
 import os
 
 # Ensure the context file exists
-context_path = "./model/params/context.ckks"
+context_path = "./model/params/context_public.ckks"
 if not os.path.exists(context_path):
     raise FileNotFoundError("CKKS encryption context file not found. Expected at ./model/params/context.ckks")
 
