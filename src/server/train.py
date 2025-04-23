@@ -27,7 +27,7 @@ X_clients = np.array_split(X_poly, n_clients)
 y_clients = np.array_split(y, n_clients)
 
 # Federated Training
-model_file = "./model/trained_model.pkl"
+model_file = "trained_model.pkl"
 if os.path.exists(model_file):
     try:
         with open(model_file, "rb") as f:
@@ -81,8 +81,8 @@ if train_new_model:
         "poly": poly
     }
 
-    os.makedirs('./model/params', exist_ok=True)
-    with open('./model/params/params.pkl', 'wb') as f:
+    os.makedirs('output', exist_ok=True)
+    with open('output/params.pkl', 'wb') as f:
         pickle.dump(model_bundle, f)
 
 # Training Evaluation
