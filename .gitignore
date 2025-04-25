@@ -3,3 +3,13 @@ src/model/params/*
 src/data/encrypted*
 src/model/trained_model.pkl
 src/model/predictions.csv
+src/client/*.pkl
+src/client/data/encrypted_user_data.pkl
+src/client/params/context_private.ckks
+src/client/params/context_public.ckks
+src/server/data/encrypted_predictions.pkl
+src/server/output/context_public.ckks
+src/server/output/encrypted_predictions.pkl
+src/server/output/encrypted_user_data.pkl
+src/client/data/predictions.csv
+src/server/data/predictions.csv

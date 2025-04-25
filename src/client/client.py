@@ -8,13 +8,13 @@ import requests
 SERVER_URL = "http://localhost:8000"
 
 BASE_DIR            = os.path.dirname(__file__)
-USER_DATA_PATH      = os.path.join(BASE_DIR, "data/user_data.csv")
-ENCRYPTED_DATA_PATH = os.path.join(BASE_DIR, "data/encrypted_user_data.pkl")
+USER_DATA_PATH      = os.path.join(BASE_DIR, "./data/user_data.csv")
+ENCRYPTED_DATA_PATH = os.path.join(BASE_DIR, "./data/encrypted_user_data.pkl")
 ENCRYPTED_PRED_PATH = os.path.join(BASE_DIR, "encrypted_predictions.pkl")
-CONTEXT_PATH        = os.path.join(BASE_DIR, "params/context_public.ckks")
-KEY_PATH            = os.path.join(BASE_DIR, "params/context_private.ckks")
-PARAMS_PATH         = os.path.join(BASE_DIR, "params/params.pkl")
-PRED_CSV_PATH       = os.path.join(BASE_DIR, "data/predictions.csv")
+CONTEXT_PATH        = os.path.join(BASE_DIR, "./params/context_public.ckks")
+KEY_PATH            = os.path.join(BASE_DIR, "./params/context_private.ckks")
+PARAMS_PATH         = os.path.join(BASE_DIR, "./params/params.pkl")
+PRED_CSV_PATH       = os.path.join(BASE_DIR, "./data/predictions.csv")
 
 st.set_page_config(page_title="PPML Client Encryption & Prediction", layout="wide")
 st.title("🛡️ PPML Client: Encrypt, Submit & Decrypt")
@@ -55,7 +55,7 @@ if uploaded_file:
 
         if os.path.exists(PARAMS_PATH) and st.button("🔐 Encrypt CSV"):
             with st.spinner("Encrypting..."):
-                enc_proc = subprocess.run(["python", "client/encrypt.py"], capture_output=True, text=True)
+                enc_proc = subprocess.run(["python", "encrypt.py"], capture_output=True, text=True)
             if enc_proc.returncode != 0:
                 st.error("Encryption failed:")
                 st.code(enc_proc.stderr)
@@ -89,7 +89,7 @@ if os.path.exists(ENCRYPTED_DATA_PATH) and os.path.exists(CONTEXT_PATH):
 # Step 3: Decrypt
 if os.path.exists(ENCRYPTED_PRED_PATH) and st.button("🧩 Decrypt Predictions"):
     with st.spinner("Decrypting..."):
-        dec_proc = subprocess.run(["python", "client/decrypt.py"], capture_output=True, text=True)
+        dec_proc = subprocess.run(["python", "decrypt.py"], capture_output=True, text=True)
     if dec_proc.returncode != 0:
         st.error("Decryption failed:")
         st.code(dec_proc.stderr)

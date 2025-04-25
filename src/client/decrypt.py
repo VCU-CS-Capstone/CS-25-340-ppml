@@ -5,11 +5,11 @@ import os
 import numpy as np
 
 # Load encryption context
-with open("./model/params/context_private.ckks", "rb") as f:
+with open("./params/context_private.ckks", "rb") as f:
     context = ts.context_from(f.read())
 
 # Load all encrypted predictions from batch .pkl file
-with open("./data/encrypted_predictions.pkl", "rb") as f:
+with open("encrypted_predictions.pkl", "rb") as f:
     encrypted_preds = pickle.load(f)
 
 scores = []
@@ -38,8 +38,8 @@ print(f"Total 0s: {zero_count}")
 print(f"Total 1s: {one_count}")
 
 # Save to CSV for frontend use
-os.makedirs("./model", exist_ok=True)
-with open("./model/predictions.csv", "w", newline="") as csvfile:
+os.makedirs("./data", exist_ok=True)
+with open("./data/predictions.csv", "w", newline="") as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(["Prediction", "Score"])
     for lbl, sc in zip(labels, scores):

@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 # Load model bundle
-with open("./model/params/params.pkl", "rb") as f:
+with open("./params/params.pkl", "rb") as f:
     param = pickle.load(f)
 
 mean = param["mean"]
@@ -35,12 +35,12 @@ context.global_scale = 2**40
 context.generate_galois_keys()
 
 # Save context
-os.makedirs("./model/params", exist_ok=True)
-with open("./model/params/context_public.ckks", "wb") as f:
+os.makedirs("./params", exist_ok=True)
+with open("params/context_public.ckks", "wb") as f:
     f.write(context.serialize())
 
 # Save key
-with open("./model/params/context_private.ckks", "wb") as f:
+with open("./params/context_private.ckks", "wb") as f:
     f.write(context.serialize(save_secret_key=True))
 
 # Encrypt each row and collect into a batch
