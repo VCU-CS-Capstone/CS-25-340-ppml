@@ -119,10 +119,6 @@ if os.path.exists(ENCRYPTED_PRED_PATH) and st.button("🧩 Decrypt Predictions")
         st.success("✅ Decryption complete!")
         preds = pd.read_csv(PRED_CSV_PATH)
         st.subheader("📊 Prediction Results")
-        st.metric("Non-diabetic (0)", (preds["Prediction"] == 0).sum())
-        st.metric("Diabetic (1)", (preds["Prediction"] == 1).sum())
-        st.dataframe(preds)
-        st.download_button("Download `predictions.csv`", preds.to_csv(index=False), "predictions.csv")
 
 if os.path.exists(PRED_CSV_PATH) and os.path.exists(USER_DATA_PATH):
     predictions_df = pd.read_csv(PRED_CSV_PATH)
