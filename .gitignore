@@ -15,3 +15,4 @@ src/client/data/predictions.csv
 src/server/data/predictions.csv
 src/client/params/params.pkl
 src/server/trained_model.pkl
+src/server/output/params.pkl
