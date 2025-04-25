@@ -28,7 +28,7 @@ def ensure_model():
             raise RuntimeError(f"Training failed:\n{result.stderr}")
         print("✅ Training complete.")
 
-@app.get("/params")
+
 @app.get("/params/")
 async def get_params():
     if not os.path.exists(PARAMS_PATH):

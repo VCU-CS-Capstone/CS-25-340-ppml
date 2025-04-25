@@ -13,3 +13,5 @@ src/server/output/encrypted_predictions.pkl
 src/server/output/encrypted_user_data.pkl
 src/client/data/predictions.csv
 src/server/data/predictions.csv
+src/client/params/params.pkl
+src/server/trained_model.pkl

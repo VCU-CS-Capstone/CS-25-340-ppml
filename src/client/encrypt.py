@@ -5,6 +5,7 @@ import os
 import numpy as np
 
 # Load model bundle
+os.makedirs("./params", exist_ok=True)
 with open("./params/params.pkl", "rb") as f:
     param = pickle.load(f)
 
@@ -35,7 +36,6 @@ context.global_scale = 2**40
 context.generate_galois_keys()
 
 # Save context
-os.makedirs("./params", exist_ok=True)
 with open("params/context_public.ckks", "wb") as f:
     f.write(context.serialize())
 
