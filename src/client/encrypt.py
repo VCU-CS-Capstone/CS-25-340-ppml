@@ -2,13 +2,16 @@ import tenseal as ts
 import pandas as pd
 import pickle
 import os
-import json
+import numpy as np
 
-# Load normalization parameters
-with open("./model/params/norm_param.json", "r") as f:
-    params = json.load(f)
-mean = params["mean"]
-std = params["std"]
+# Load model bundle
+os.makedirs("./params", exist_ok=True)
+with open("./params/params.pkl", "rb") as f:
+    param = pickle.load(f)
+
+mean = param["mean"]
+std = param["std"]
+poly = param["poly"]
 
 # Load input user data
 input_path = "./data/user_data.csv"
@@ -20,6 +23,9 @@ data = df.values
 # Normalize data
 normalized_data = (data - mean) / std
 
+# Apply polynomial transformation
+X_poly = poly.transform(normalized_data)
+
 # Create encryption context
 context = ts.context(
     ts.SCHEME_TYPE.CKKS,
@@ -30,13 +36,16 @@ context.global_scale = 2**40
 context.generate_galois_keys()
 
 # Save context
-os.makedirs("./model/params", exist_ok=True)
-with open("./model/params/context.ckks", "wb") as f:
+with open("params/context_public.ckks", "wb") as f:
+    f.write(context.serialize())
+
+# Save key
+with open("./params/context_private.ckks", "wb") as f:
     f.write(context.serialize(save_secret_key=True))
 
 # Encrypt each row and collect into a batch
 batch_encrypted = []
-for row in normalized_data:
+for row in X_poly:
     enc_vec = ts.ckks_vector(context, row)
     batch_encrypted.append(enc_vec.serialize())
 
