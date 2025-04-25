@@ -191,3 +191,14 @@ if os.path.exists(PRED_CSV_PATH) and os.path.exists(USER_DATA_PATH):
 
         if st.checkbox("Show descriptive statistics"):
             st.write(user_df.groupby("Prediction")[feature].describe())
+                  
+# --- Reset Demo Button ---
+st.sidebar.markdown("---")
+if st.sidebar.button("🔄 Reset Demo"):
+    with st.spinner("Resetting..."):
+        result = subprocess.run(["python", "reset_demo.py"], capture_output=True, text=True)
+        if result.returncode == 0:
+            st.sidebar.success("Demo reset! Please refresh the app.")
+        else:
+            st.sidebar.error("Failed to reset.")
+            st.sidebar.code(result.stderr)
