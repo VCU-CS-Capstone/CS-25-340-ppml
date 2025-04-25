@@ -152,46 +152,53 @@ if os.path.exists(PRED_CSV_PATH) and os.path.exists(USER_DATA_PATH):
     tab1, tab2, tab3 = st.tabs(["Prediction Distribution", "Feature Correlations", "Feature Analysis"])
 
     with tab1:
-        fig1, ax1 = plt.subplots(figsize=(6, 6))
-        ax1.pie(
-            [(user_df["Prediction"] == 0).sum(), (user_df["Prediction"] == 1).sum()],
-            labels=["Non-diabetic", "Diabetic"],
-            autopct="%1.1f%%",
-            startangle=90,
-            colors=["#3498db", "#e74c3c"]
-        )
-        ax1.axis("equal")
-        st.pyplot(fig1)
+        col1, col2 = st.columns(2)
 
-        fig2, ax2 = plt.subplots(figsize=(10, 6))
-        sns.histplot(user_df["Score"], bins=20, kde=True, ax=ax2)
-        ax2.axvline(x=0.5, color='r', linestyle='--', label='Threshold')
-        ax2.set_title("Score Distribution")
-        ax2.legend()
-        st.pyplot(fig2)
+        with col1:
+            fig1, ax1 = plt.subplots(figsize=(4.5, 4.5))
+            ax1.pie(
+                [(user_df["Prediction"] == 0).sum(), (user_df["Prediction"] == 1).sum()],
+                labels=["Non-diabetic", "Diabetic"],
+                autopct="%1.1f%%",
+                startangle=90,
+                colors=["#3498db", "#e74c3c"]
+            )
+            ax1.axis("equal")
+            ax1.set_title("Prediction Breakdown", fontsize=10)
+            st.pyplot(fig1)
+
+        with col2:
+            fig2, ax2 = plt.subplots(figsize=(5.5, 3.5))
+            sns.histplot(user_df["Score"], bins=20, kde=True, ax=ax2)
+            ax2.axvline(x=0.5, color='r', linestyle='--', label='Threshold')
+            ax2.set_title("Score Distribution", fontsize=10)
+            ax2.legend()
+            st.pyplot(fig2)
 
     with tab2:
-        fig3, ax3 = plt.subplots(figsize=(12, 10))
+        fig3, ax3 = plt.subplots(figsize=(7.5, 6.5))
         corr = user_df.select_dtypes(include=np.number).corr()
-        sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm", ax=ax3)
-        ax3.set_title("Correlation Heatmap")
+        mask = np.triu(np.ones_like(corr, dtype=bool))
+        sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="coolwarm", ax=ax3)
+        ax3.set_title("Correlation Heatmap", fontsize=12)
         st.pyplot(fig3)
 
     with tab3:
         feature = st.selectbox("Select a feature:", [col for col in user_df.columns if col not in ["Prediction", "Score"]])
-        fig4, ax4 = plt.subplots(figsize=(10, 6))
+
+        fig4, ax4 = plt.subplots(figsize=(6, 4))
         sns.boxplot(data=user_df, x="Prediction", y=feature, ax=ax4)
-        ax4.set_title(f"{feature} by Prediction")
+        ax4.set_title(f"{feature} by Prediction", fontsize=11)
         st.pyplot(fig4)
 
-        fig5, ax5 = plt.subplots(figsize=(10, 6))
+        fig5, ax5 = plt.subplots(figsize=(6, 4))
         sns.histplot(data=user_df, x=feature, hue="Prediction", kde=True, multiple="dodge", ax=ax5)
-        ax5.set_title(f"Distribution of {feature} by Prediction")
+        ax5.set_title(f"{feature} Distribution by Prediction", fontsize=11)
         st.pyplot(fig5)
 
         if st.checkbox("Show descriptive statistics"):
             st.write(user_df.groupby("Prediction")[feature].describe())
-                  
+
 # --- Reset Demo Button ---
 st.sidebar.markdown("---")
 if st.sidebar.button("🔄 Reset Demo"):
